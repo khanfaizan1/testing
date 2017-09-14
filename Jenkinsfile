@@ -14,7 +14,7 @@ pipeline {
             
           },
           "More Test": {
-            sh 'ping -c 35.185.250.150'
+            sh 'ping -c 4 35.185.250.150'
             
           }
         )
