@@ -8,7 +8,16 @@ pipeline {
     }
     stage('Test') {
       steps {
-        sh 'ping -c 2 35.185.250.150'
+        parallel(
+          "Test": {
+            sh 'ping -c 2 35.185.250.150'
+            
+          },
+          "More Test": {
+            sh 'ping -c 35.185.250.150'
+            
+          }
+        )
       }
     }
     stage('Depoly') {
