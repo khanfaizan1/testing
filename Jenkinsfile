@@ -1,29 +1,27 @@
 pipeline {
   agent any
   stages {
-    stage('Build') {
+    stage('init') {
       steps {
-        sh 'ping -c 1 35.185.250.150'
+        script {
+         def sbtHome = tool 'sbt 1.0.0-M4'
+         env.sbt= "${sbtHome}/bin/sbt -no-colors -batch"
+        }
       }
+    }
+    stage('Build') {
+        steps {
+          sh "${sbt} 'set test in assembly := {}' assembly"
+          archive includes: 'target/scala-*/toto.jar'
+        }
     }
     stage('Test') {
-      steps {
-        parallel(
-          "Test": {
-            sh 'ping -c 2 35.185.250.150'
-            
-          },
-          "More Test": {
-            sh 'ping -c 4 35.185.250.150'
-            
-          }
-        )
-      }
-    }
-    stage('Depoly') {
-      steps {
-        sh 'ping -c 3 35.185.250.150'
-      }
+        when { branch 'master' }
+        agent { docker 'openjdk:7-jre' }
+        steps {
+          echo 'Hello, JDK'
+          sh 'java -version'
+        }
     }
   }
 }
