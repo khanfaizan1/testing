@@ -1,27 +1,31 @@
-pipeline {
-  agent any
-  stages {
-    stage('init') {
-      steps {
-        script {
-         def sbtHome = tool 'sbt 1.0.0-M4'
-         env.sbt= "${sbtHome}/bin/sbt -no-colors -batch"
-        }
-      }
-    }
-    stage('Build') {
-        steps {
-          sh "${sbt} 'set test in assembly := {}' assembly"
-          archive includes: 'target/scala-*/toto.jar'
-        }
-    }
-    stage('Test') {
-        when { branch 'master' }
-        agent { docker 'openjdk:7-jre' }
-        steps {
-          echo 'Hello, JDK'
-          sh 'java -version'
-        }
-    }
+#!groovy
+
+node {
+  def sbtHome = tool 'default-sbt'
+  //def SBT = "${sbtHome}/bin/sbt -Dsbt.log.noformat=true -Dsbt.override.build.repos=true"
+  def SBT = "${sbtHome}/bin/sbt -Dsbt.log.noformat=true"
+
+  def branch = env.BRANCH_NAME
+
+  echo "current branch is ${branch}"
+
+  // Mandatory, to maintain branch integrity
+  checkout scm
+
+  stage('Cleanup') {
+    sh "${SBT} clean"
   }
+
+  stage('Build') {
+    sh "${SBT} package"
+  }
+
+  stage('Publish-Local') {
+    sh "${SBT} publish-local"
+  }
+
+  stage('Archive') {
+    archive 'target/**/test-dep*.jar'
+  }
+
 }
