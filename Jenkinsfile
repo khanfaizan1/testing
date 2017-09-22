@@ -1,31 +1,19 @@
-#!groovy
-
-node {
-  def sbtHome = tool 'jsbt'
-  //def SBT = "${sbtHome}/bin/sbt -Dsbt.log.noformat=true -Dsbt.override.build.repos=true"
-  def SBT = "${sbtHome}/usr/share/sbt/bin/ -Dsbt.log.noformat=true"
-
-  def branch = env.master
-
-  echo "current branch is ${master}"
-
-  // Mandatory, to maintain branch integrity
-  checkout scm
-
-  stage('Cleanup') {
-    sh "${SBT} clean"
+pipeline {
+  agent any
+  stages {
+    stage('init') {
+      steps {
+        script {
+         def sbtHome = tool 'sbt-1.0.0-M4'
+         env.sbt= "${sbtHome}/bin/sbt -no-colors -batch"
+        }
+      }
+    }
+    stage('Build') {
+        steps {
+          sh "${sbt} 'set test in assembly := {}' assembly"
+          archive includes: 'target/scala-*/toto.jar'
+        }
+    }
   }
-
-  stage('Build') {
-    sh "${SBT} package"
-  }
-
-  stage('Publish-Local') {
-    sh "${SBT} publish-local"
-  }
-
-  stage('Archive') {
-    archive 'target/**/test-dep*.jar'
-  }
-
 }
