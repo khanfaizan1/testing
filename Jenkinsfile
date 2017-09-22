@@ -4,7 +4,7 @@ pipeline {
     stage('init') {
       steps {
         script {
-         def sbtHome = tool 'sbt-1.0.0-M4'
+         def sbtHome = tool 'sbt 1.0.0-M4'
          env.sbt= "${sbtHome}/bin/sbt -no-colors -batch"
         }
       }
