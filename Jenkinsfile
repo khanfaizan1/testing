@@ -1,7 +1,7 @@
 #!groovy
 
 node {
-  def sbtHome = tool 'default-sbt'
+  def sbtHome = tool 'jsbt'
   //def SBT = "${sbtHome}/bin/sbt -Dsbt.log.noformat=true -Dsbt.override.build.repos=true"
   def SBT = "${sbtHome}/usr/share/sbt/bin/ -Dsbt.log.noformat=true"
 
